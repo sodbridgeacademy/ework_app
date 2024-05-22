@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Application Status{% endblock %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <h4>Update Status for this request: Workplace {{ application.posting_place }} by student {{ application.student.username }}</h4> <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Update Status</button>
+    </form>
+{% endblock %}

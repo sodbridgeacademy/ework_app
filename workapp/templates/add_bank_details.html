@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Add or Update Bank Details{% endblock %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h4 style="color:green">Add or Update Bank Details</h4> <hr>
+                <form method="post" action="{% url 'add_bank_details' %}">
+                    {% csrf_token %}
+                    {{ bank_form|crispy }}
+                <button type="submit" class="btn btn-info">Save Bank Details</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ supervisor.username }}'s Details{% endblock %}
+
+{% block content %}
+    <h4 style="color:blue">Supervisor Dashboard</h4>
+    <hr>
+
+    <h6 style="color:blue;"><em>***Welcome {{ supervisor.username }}'s Details***</em></h4> <hr>
+
+    <p><strong>First Name:</strong> {{ supervisor.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ supervisor.last_name }}</p>
+    <p><strong>Email:</strong>{% if supervisor.email %} {{ supervisor.email }} {% else %} None {% endif %}</p>
+    <p><strong>Supervised Places:</strong></p>
+    <ul>
+        {% for place in supervised_places %}
+        <li>{{ place.name }} - {{ place.location }}</li>
+        {% empty %}
+        <li>No supervised places found</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

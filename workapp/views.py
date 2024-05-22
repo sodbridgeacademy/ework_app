@@ -1,0 +1,327 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login
+from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
+	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
+	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm
+from django.contrib.auth.decorators import login_required
+from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
+from datetime import date
+from django.contrib import messages
+
+
+# Create your views here.
+def index(request):
+	return redirect('register_student')
+
+
+def login(request):
+    return render(request, 'login.html')
+
+
+def register_student(request):
+    if request.method == 'POST':
+        form = StudentRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.registration_date = date.today()            
+            user.role = 'student'
+            user.save()
+            #login(request)
+            return redirect('login')
+    else:
+        form = StudentRegistrationForm()
+    return render(request, 'register_student.html', {'form': form})
+
+
+def register_director(request):
+    if request.method == 'POST':
+        form = DirectorRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            #user.registration_date = date.today()
+            user.role = 'director'
+            user.save()
+            #login(request, user)
+            return redirect('login')
+    else:
+        form = DirectorRegistrationForm()
+    return render(request, 'register_director.html', {'form': form})
+
+
+
+def register_supervisor(request):
+    if request.method == 'POST':
+        form = SupervisorRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            #user.registration_date = date.today()
+            user.role = 'supervisor'
+            user.save()
+            
+            return redirect('login')
+    else:
+        form = SupervisorRegistrationForm()
+    return render(request, 'register_supervisor.html', {'form': form})
+
+
+@login_required
+def dashboard(request):
+    user = request.user
+    # user = request.user
+    if user.role == 'student':
+        posting_places = PostingPlace.objects.all()
+        applications = StudentApplication.objects.filter(student=request.user)
+        work_statuses = WorkStatus.objects.filter(
+            application__student=user).order_by('week_number')
+        work_statuses_count = work_statuses.count()
+        print(f'work status count => {work_statuses_count}')
+        max_submissions = 6
+
+
+        if request.method == 'POST':
+            application_form = StudentApplicationForm(request.POST)
+            posting_place_form = PostingPlaceForm2(request.POST)
+            if 'apply_place' in request.POST:
+                if application_form.is_valid():
+                    application = application_form.save(commit=False)
+                    application.student = request.user
+                    application.save()
+                    return redirect('dashboard')
+            elif 'add_post_place' in request.POST:
+                if posting_place_form.is_valid():
+                    posting_place_form.save()
+                    return redirect('dashboard')
+        else:
+            application_form = StudentApplicationForm()
+            posting_place_form = PostingPlaceForm2()
+    	
+        
+        try:
+            bank_detail = BankDetails.objects.get(user=user)
+            print(f" {user.username} bank details => {bank_detail}")
+        except BankDetails.DoesNotExist:
+            bank_detail = None
+
+        ctx = {'posting_places': posting_places, 'applications': applications, 
+                'form': application_form, 'posting_place_form':posting_place_form,
+                 'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, \
+                    'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user}
+
+        return render(request, 'student_dashboard.html', ctx)
+    elif user.role == 'director':
+        applications = StudentApplication.objects.all()
+        supervisors = User.objects.filter(role='supervisor')
+        posting_places = PostingPlace.objects.all()
+        students = User.objects.filter(role='student')
+        if request.method == 'POST':
+            place_form = PostingPlaceForm(request.POST)
+            if place_form.is_valid():
+                place_form.save()
+                return redirect('dashboard')
+        else:
+            place_form = PostingPlaceForm()
+        ctx = {
+            'applications': applications,
+            'supervisors': supervisors,
+            'students': students,
+            'place_form': place_form,
+            'posting_places':posting_places,
+            'user': user
+        }
+        # return director dashboard
+        return render(request, 'director_dashboard.html', ctx)
+    elif user.role == 'supervisor':
+        # Get the posting place assigned to the supervisor
+        posting_place = PostingPlace.objects.filter(supervisor=user).first()
+        #students_assigned = posting_place
+        applications = StudentApplication.objects.filter(posting_place=posting_place).all()
+        print(f"student applications => {applications}")
+        students = []
+
+        # Get the students assigned to the supervisor's posting place
+        work_statuses = []
+        if posting_place:
+            students = User.objects.filter(applications__posting_place=posting_place).distinct()
+            #print(f'students posted to your ppa => {students.applications}')
+            work_statuses = WorkStatus.objects.filter(
+                application__posting_place__supervisor=user).order_by('week_number')
+
+	    	# Attach work statuses to each student
+            for student in students:
+                student.work_statuses = WorkStatus.objects.filter(application__student=student, 
+	    			application__posting_place=posting_place)
+
+        ctx = {
+	        'user': user,
+            #'students_assigned':students_assigned,
+	        'posting_place': posting_place,
+	        'students': students,
+            'work_statuses': work_statuses,
+            'applications':applications
+	    }
+        return render(request, 'supervisor_dashboard.html', ctx)
+    else:
+        # Handle other cases (optional)
+        return render(request, 'other_dashboard.html')
+
+
+@login_required
+def update_application_status(request, application_id):
+    application = get_object_or_404(StudentApplication, id=application_id)
+    if request.method == 'POST':
+        form = StudentApplicationForm2(request.POST, instance=application)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    else:
+        form = StudentApplicationForm2(instance=application)
+    return render(request, 'update_application_status.html', {'form': form, 'application': application})
+
+
+@login_required
+def update_posting_place(request, posting_place_id):
+    posting_place = get_object_or_404(PostingPlace, id=posting_place_id)
+    if request.method == 'POST':
+        form = UpdatePostingPlaceForm(request.POST, instance=posting_place)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')  # Redirect to director dashboard after successful update
+    else:
+        form = UpdatePostingPlaceForm(instance=posting_place)
+    return render(request, 'update_posting_place.html', {'form': form, 'posting_place': posting_place})
+
+
+@login_required
+def supervisor_detail(request, pk):
+    supervisor = get_object_or_404(User, pk=pk, role='supervisor')
+    supervised_places = PostingPlace.objects.filter(supervisor=supervisor)
+    context = {
+        'supervisor': supervisor,
+        'supervised_places': supervised_places,
+    }
+    return render(request, 'supervisor_detail.html', context)
+
+
+@login_required
+def student_detail(request, pk):
+    student = get_object_or_404(User, pk=pk, role='student')
+    applications = StudentApplication.objects.filter(student=student)
+    bank_details = BankDetails.objects.filter(user=student).first()
+    work_statuses = WorkStatus.objects.filter(application__student=student)
+    all_work_status_approved = all(ws.supervisor_checked for ws in work_statuses)
+    # get latest student application
+    latest_application = applications.latest('id') if applications.exists() else None
+
+    try:
+        bank_detail = BankDetails.objects.get(user=student)
+        print(f" {student.username} bank details => {bank_detail}")
+    except BankDetails.DoesNotExist:
+        bank_detail = None
+
+    context = {
+        'student': student,
+        'applications': applications,
+        'bank_details': bank_details,
+        'work_statuses': work_statuses,
+        'all_work_status_approved': all_work_status_approved,
+        'latest_application':latest_application,
+        'bank_detail':bank_detail
+    }
+    return render(request, 'student_detail.html', context)
+
+
+@login_required
+def make_payment(request, student_id):
+    student = get_object_or_404(User, pk=student_id, role='student')
+    # Logic for making the payment (this can be a simple confirmation for now)
+    # For example, setting a "paid" status on the student's applications or work statuses
+    applications = StudentApplication.objects.filter(student=student, status='approved')
+    applications.update(payment_status=True)
+    # Redirect back to the student detail page
+    return redirect('student_detail', pk=student.id)
+
+
+@login_required
+def approve_work_status(request, student_id, week_number):
+    user = request.user
+    if user.role != 'supervisor':
+        print('Not a supervisor!')
+        return redirect('dashboard')
+    
+    student = get_object_or_404(User, pk=student_id, role='student')
+    posting_place = PostingPlace.objects.filter(supervisor=user).first()
+    
+    if not posting_place:
+        messages.error(request, 'You do not have a posting place assigned.')
+        return redirect('dashboard')
+    
+    application = StudentApplication.objects.filter(student=student, posting_place=posting_place, status='approved').first()
+    
+    if not application:
+        messages.error(request, 'No approved application found for this student at your posting place.')
+        return redirect('dashboard')
+    
+    work_status, created = WorkStatus.objects.get_or_create(application=application, week_number=week_number)
+    
+    if request.method == 'POST':
+        work_status.supervisor_checked = True
+        work_status.save()
+        
+        # Check if all weeks are approved by both student and supervisor
+        all_weeks_checked = WorkStatus.objects.filter(application=application, student_checked=True, supervisor_checked=True).count()
+        if all_weeks_checked == 6:
+            application.work_completed = True
+            application.save()
+            messages.success(request, 'All weeks approved. Work completed.')
+        elif all_weeks_checked > 6:
+            messages.success(request, 'Total number of weeks reached!')
+        else:
+            messages.success(request, f'Work status for week {week_number} approved.')
+        
+        return redirect('dashboard')
+    ctx =  {'work_status': work_status, 'week_number': week_number, 'student': student}
+
+    return render(request, 'approve_work_status.html', ctx)
+
+
+@login_required
+def submit_work_status(request):
+    if request.method == 'POST':
+        form = WorkStatusForm(request.POST)
+        if form.is_valid():
+            work_status = form.save(commit=False)
+            application = StudentApplication.objects.filter(student=request.user, status='approved').first()
+            work_status.application = application
+            work_status.student_checked = True
+            work_status.save()
+            messages.success(request, 'Work status submitted successfully.')
+            return redirect('dashboard')
+    else:
+        form = WorkStatusForm()
+    return render(request, 'submit_work_status.html', {'form': form})
+
+
+
+@login_required
+def add_bank_details(request):
+    user = request.user
+    if user.role != 'student':
+        return redirect('dashboard')
+
+    try:
+        bank_details = BankDetails.objects.get(user=user)
+    except BankDetails.DoesNotExist:
+        bank_details = None
+
+    if request.method == 'POST':
+        bank_form = BankDetailsForm(request.POST, instance=bank_details)
+        if bank_form.is_valid():
+            bank_detail = bank_form.save(commit=False)
+            bank_detail.user = user
+            bank_detail.save()
+            messages.success(request, 'Bank details updated successfully.')
+            return redirect('dashboard')
+    else:
+        bank_form = BankDetailsForm(instance=bank_details)
+
+    return render(request, 'add_bank_details.html', {'bank_form': bank_form, 'user': user})

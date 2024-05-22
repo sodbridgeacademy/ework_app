@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Dashboard{% endblock %}
+
+{% block content %}
+    <h4 style="color:blue">Supervisor Dashboard</h4> <hr>
+    <h6><em>***Welcome, {{ user.username }}***</em></h6>
+    <small>
+        {% if posting_place %}
+        <p style="color:black;"><strong>{{ posting_place.name }} Supervisor </strong></p>
+    {% else %}
+        <p style="color:red">You have not been assigned to any posting place! <br> Contact the school director to assign you!</p>
+    {% endif %}
+    </small>
+    <hr> <br><br>
+    
+    <!-- Supervisor Details -->
+    <h5 style="color:blue;">My Bio</h5> <hr>
+    <ul>
+        <li><strong>Username:</strong> {{ user.username }}</li>
+        <li><strong>First Name:</strong> {{ user.first_name }}</li>
+        <li><strong>Last Name:</strong> {{ user.last_name }}</li>
+        <li><strong>Email:</strong>{% if user.email %} {{ user.email }} {% else %} None {% endif %}</li>
+        <li><strong>Specialization:</strong>{{ user.specialization }}</li>
+    </ul> <br><br>
+    
+
+    <!-- Students Assigned to Posting Place -->
+    <h5 style="color:blue;">Students Applications To  Your Work Post</h5> <hr>
+    {% if students %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Matric Number</th>
+                    <th>Department</th>
+                    <th>Application Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in applications %}
+                <tr>
+                    <td>{{ student.student.first_name }} {{ student.last_name }}</td>
+                    <td>{{ student.student.matric_number }}</td>
+                    <td>{{ student.student.department }}</td>
+                    <td>{{ student.status }}</td>
+
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color:red">No students have been posted to your work place!</p>
+    {% endif %} <br><br>
+
+
+    <!-- Work Status -->
+    <h5 style="color:blue;">Students Weekly Report Status</h5> <hr>
+    {% if students %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Week Number</th>
+                    <th>Student Name</th>
+                    <th>Student Status</th>
+                    <th>Your Approval</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work_status in work_statuses %}
+                <tr>
+                    <td>Week {{ work_status.week_number }}</td>
+                    <td>{{ work_status.application.student.first_name }} {{ work_status.application.student.last_name }}</td>
+                    <td>
+                        {% if work_status.student_checked %}
+                            Student Checked
+                        {% else %}
+                            Not Checked by Student
+                        {% endif %}
+                        -
+                        {% if work_status.supervisor_checked %}
+                            Approved
+                        {% else %}
+                            Not Approved
+                        {% endif %}
+                    </td>
+                    <td>{{ work_status.supervisor_checked }}</td>
+                    <td>
+                        {% if not work_status.supervisor_checked %}
+                            <form method="post" action="{% url 'approve_work_status' work_status.application.student.id work_status.week_number %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Approve</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color:red">No weekly report!</p>
+    {% endif %}
+{% endblock %}

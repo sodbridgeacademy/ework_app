@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Dashboard{% endblock %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <h4 style="color:red">Director Dashboard</h4>
+    <hr>
+    <h6><em>***Welcome, {{ user.username }}***</em></h6><hr> <br><br>
+
+
+    <!-- List of Posting Places -->
+    <h5 style="color:red">Posting Places</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Work place</th>
+                <th>Location</th>
+                <th>Supervisor</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for posting_place in posting_places %}
+            <tr>
+                <td>{{ posting_place.name }}</td>
+                <td> {{ posting_place.location }}</td>
+                <td>{% if posting_place.supervisor %} {{ posting_place.supervisor.first_name }}
+                    {{ posting_place.supervisor.last_name }} {% else %} None {% endif %}
+                </td>
+                <td><a class="btn btn-info" href="{% url 'update_posting_place' posting_place.id %}">Update</a></td>
+            </tr>
+                {% empty %}
+            <tr>
+                <td colspan="4">No work places found!</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <br><br>
+
+    
+    <!-- Add Posting Place Form -->
+    <h5 style="color:red">Add New Posting Place</h5> <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ place_form|crispy }}
+        <button type="submit" class="btn btn-info">Add Posting Place</button>
+    </form> <br><br>
+    
+    <!-- List of Student Applications -->
+    <h5 style="color:red">Student Applications</h5> <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Matric No</th>
+                <th>Posting Place</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.student.first_name }}, {{ application.student.last_name }}</td>
+                <td>{{ application.student.matric_number }}</td>
+                <td>{{ application.posting_place.name }}</td>
+                <td>{{ application.get_status_display }}</td>
+                <td>
+                    <a href="{% url 'update_application_status' application.id %}" class="btn btn-info">Update Status</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No applications found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br><br>
+    
+    <h5 style="color:red">All Users</h5><hr>
+    <div class="row">
+        <div class="col-6">
+            <!-- List of Supervisors -->
+            <h5 style="color:blue;">Supervisors</h5>
+            <ul>
+                {% for supervisor in supervisors %}
+                <li><a href="{% url 'supervisor_detail' supervisor.pk %}">{{ supervisor.username }}</a></li>
+                {% empty %}
+                <li>No supervisors found</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="col-6">
+            <!-- List of Students -->
+            <h5 style="color:green;">Students</h5>
+            <ul>
+                {% for student in students %}
+                <li><a href="{% url 'student_detail' student.pk %}">{{ student.username }} - {{ student.first_name }} {{ student.last_name }}</a></li>
+                {% empty %}
+                <li>No students found</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div> <hr> <br> 
+{% endblock %}

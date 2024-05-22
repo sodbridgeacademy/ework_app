@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Dashboard{% endblock %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <h4 style="color:green">Student Dashboard</h4> <hr>
+    <h6><em>***Welcome, {{ user.username }}***</em></h6>
+    <small>{{ user.first_name}}, {{ user.last_name }}</small><hr>  <br>
+    <!-- Dashboard-specific content goes here -->
+
+       <!-- Applications Table -->
+    <h5 style="color:green">My Applications</h5>
+    {% if applications %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Posting Place</th>
+                <th>Director Approval</th>
+                <th>Work Completed</th>
+                <th>Payment Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.posting_place.name }}</td>
+                <td>{{ application.get_status_display }}</td>
+                <td>{{ application.work_completed }}</td>
+                <td>{% if application.payment_status %}<span style="color:green">Paid</span>
+                    {% else %}<span style="color:red">Unpaid</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No applications submitted</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color:red;">No applications submitted!</p><hr> <br>
+         <!-- Application Form -->
+        <h5>Apply for a Posting Place</h5>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" name="apply_place" class="btn btn-info">Submit Application</button>
+        </form>
+        <br> <br>
+
+        <!-- Form for adding a new posting place -->
+    <h5>Posting Place Not In The List? Add One Now & Apply!</h5> <hr>
+    <form method="post">
+        {% csrf_token %}
+        {{ posting_place_form|crispy }}
+        <button type="submit" class="btn btn-info" name="add_post_place">Add Place</button>
+    </form>
+
+    {% endif %}<br><hr>
+
+    <!-- Form for submitting work status -->
+    <div class="row">
+        <div class="col-6">
+            <!-- Bank Details Form -->
+            <h5 style="color:green">Bank Details</h5>
+            {% if bank_detail %}
+                <p><strong>Bank Name:</strong> {{ bank_detail.bank_name }}</p>
+                <p><strong>Account Number:</strong> {{ bank_detail.account_number }}</p>
+                <p><strong>Account Name:</strong> {{ bank_detail.account_name }}</p>
+                <a href="{% url 'add_bank_details' %}" class="btn btn-info">Update Bank Details</a> <br>
+            {% else %}
+                <p>No bank details provided yet.</p>
+                <a href="{% url 'add_bank_details' %}" class="btn btn-info">Add Bank Details</a> <br>
+            {% endif %}
+        </div>
+
+        <div class="col-6">
+            <h5 style="color:green">Weekly Report Status</h5>
+            {% if work_status_count < max_submissions %}
+                <form method="post" action="{% url 'submit_work_status' %}">
+                    {% csrf_token %}
+                    {{ work_status_form|crispy }}
+                    <button type="submit" class="btn btn-info">Click Here To Send</button>
+                </form>
+                
+            {% else %}
+                {% for application in applications %}
+                    {% if  application.status != 'approved' %}
+                        <p style="color:red;">Oops! Your application hasn't been approved yet!</p>
+                {% else %}
+                <p style="color:red;">You have reached the maximum number of weekly submissions ({{ max_submissions }}).</p>
+                    {% endif %}
+                {% endfor %}
+
+            {% endif %}
+        </div>
+    </div>
+    
+    <br><br><br>
+
+
+    <!-- Table to display work status -->
+    <h5 style="color:green">Your Weekly Report Status</h5>
+    <table class="table dark">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Student Check</th>
+                <th>Supervisor Approval</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for status in work_statuses %}
+            <tr>
+                <td>{{ status.week_number }}</td>
+                <td>{{ status.student_checked }}</td>
+                <td>{{ status.supervisor_checked }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No work status entries found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> <br><br>
+
+ {% endblock %}

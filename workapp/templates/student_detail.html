@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.username }}'s Details{% endblock %}
+
+{% block content %}
+    <h4 style="color:green"> {{ student.first_name }} {{ student.last_name }} Details</h4><hr><br> <br>
+    
+    <!-- Bank Details -->
+    <h5 style="color:green">Bank Details</h5><hr>
+    {% if bank_details %}
+        <p>Bank Name: {{ bank_detail.bank_name }}</p>
+        <p>Account Number: {{ bank_detail.account_number }}</p>
+        <p>Account Name: {{ bank_detail.account_name }}</p>
+    {% else %}
+        <p>No bank details available.</p>
+    {% endif %}
+    <br> <br>
+    
+    <!-- Applications Status -->
+    <h5 style="color:green">Applications</h5> <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Posting Place</th>
+                <th>Director Approval</th>
+                <th>Work Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.posting_place.name }}</td>
+                <td>{{ application.get_status_display }}</td>
+                <td>{{ application.work_completed }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No applications found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> <br> <br>
+    
+    <!-- Work Status -->
+    <h5 style="color:green">Work Status</h5> <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Student Approval</th>
+                <th>Supervisor Approval</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work_status in work_statuses %}
+            <tr>
+                <td>{{ work_status.week_number }}</td>
+                <td>{{ work_status.student_checked }}</td>
+                <td>{{ work_status.supervisor_checked }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No work status updates found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br><br>
+    
+    <!-- Payment Section -->
+    <h5 style="color:green">Payment</h5> <hr>
+    {% if latest_application.work_completed and not latest_application.payment_status %}
+        <form method="post" action="{% url 'make_payment' student.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Make Payment</button>
+        </form>
+    {% elif latest_application.payment_status %}
+        <p style="color:blue;">Payment already made.</p>
+    {% else %}
+        <p style="color:red;">Work status not fully completed. Payment cannot be made!</p>
+    {% endif %}
+
+{% endblock %}

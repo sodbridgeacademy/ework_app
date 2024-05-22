@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Approve Work Status{% endblock %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+    <h4>Approve Status for {{ student.username }} - Week {{ week_number }}</h4>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="week_number" value="{{ week_number }}">
+        <button type="submit" class="btn btn-info">Approve Work Status</button>
+    </form>
+{% endblock %}
