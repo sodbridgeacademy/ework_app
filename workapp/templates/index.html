@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crawford WSP</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/icon.jpeg' %}">
+    <style>
+       /* body {
+            background-color: #e0f7fa;
+        }*/
+        .container {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 1px 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .hero-image {
+            width: 90%;
+            height: 350px;
+            background: url('{% static "images/workstudy4.jpeg" %}') center center/cover no-repeat;
+            border-radius: 8px;
+            margin: auto;
+            margin-top: 10px;
+
+        }
+        .hero-image2 {
+            width: 75%;
+            height: 250px;
+            background: url('{% static "images/req1.jpeg" %}') center center/cover no-repeat;
+            border-radius: 8px;
+            margin: auto;
+            margin-top: 10px;
+
+        }
+        h1, h2, h3, h4 {
+            text-align: center;
+        }
+        a{
+            color: white;
+            text-decoration-color: white;
+        }
+        .nav-link {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-info bg-dark">
+        <a style="color:white;" class="navbar-brand" href="{% url 'index' %}">WSP App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a style="color: #fff;" class="nav-link btn btn-primary" href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="nav-item"><a style="color: #fff;" class="nav-link btn btn-danger ml-2" href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-info" href="{% url 'login' %}">Login</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger ml-1" href="{% url 'register_director' %}">Register as Director</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary ml-1" href="{% url 'register_supervisor' %}">Register as Supervisor</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>Welcome to Crawford Work Study Program App</h1><hr> <br>
+        <div class="hero-image"></div> <br>
+        <h2 class="mt-4">About the Program</h2>
+        <p>The Crawford Work-Study program (WSP) department offers students practical experience and exposure to instill the values of labor dignity and create opportunities for earning income.</p> <br><hr>
+
+        <h3>Objectives</h3>
+        <p>The primary aim of the work-study program is not only to alleviate financial burdens but also to enable students to work while they learn. This helps them integrate and prepare more effectively into a changing society after graduation.</p>
+        <p>Crawford University runs a work-study program that provides limited employment opportunities for students to help reduce their financial burdens. A substantial amount of the university's budget is allocated to support this program.</p><hr>
+        <br>
+        
+        <div class="hero-image2"></div> <br><hr>
+
+        <h2>Guidelines</h2>
+        <p>
+            <ul>
+                <li>Students are allowed to participate in this program once per academic session (either in the first semester or the second semester).</li>
+                <li>You are required to work eight times in a semester. You can complete these eight sessions within one month or spread them out, but ensure you work a total of eight times.</li>
+                <li>Students must work 2 hours per day, two days a week (i.e., 4 hours per week) for four weeks in a month. Any deviation from this schedule will result in deductions from your payment.</li>
+                <li>When choosing your placement, keep in mind that you might not get your preferred location due to certain circumstances (first come, first served).</li>
+                <li>You will need to send your daily log activities to your supervisor for approval. After completing the work activities, there will be a final submission to the director of the department/admin for review and payment</li>
+                <li> Payment will be calculated based on the hours and days the student has worked. Full payment for completing the program is ten thousand naira only (₦10,000).</li>
+            </ul>  
+        </p> <br> <hr>
+
+        <h2>Eligibility: To register for the program, you must meet the following criteria:</h2>
+        <p>
+            <ul>
+                <li>Be a full-time undergraduate student.</li>
+                <li>Provide a passport photograph.</li>
+                <li>Have at least a second-class lower division standing.</li>
+                <li>Obtain a recommendation from your Head of Department (HOD) with a stamp.</li>
+                <li>Upload your student ID card.</li>
+                <li>Have an active email address and phone number.</li>
+            </ul>
+        </p> <br>
+
+        <h2 style="color: red;">Are you a student?</h2>
+            <h3>
+                <a class="btn btn-info" href="{% url 'register_student' %}">Click Here To Register Now</a>
+            </h3><br> <hr>
+
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

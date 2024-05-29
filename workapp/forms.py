@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from .models import User, StudentApplication, PostingPlace, BankDetails, WorkStatus
@@ -18,7 +18,7 @@ class StudentRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_of_birth', 'gender', 'matric_number', 
+        fields = ['first_name', 'last_name', 'email', 'phone_number', 'date_of_birth', 'gender', 'matric_number', 
         'department', 'password1', 'password2']
 
 
@@ -80,11 +80,15 @@ class SupervisorRegistrationForm(UserCreationForm):
         self.fields['password2'].help_text = None
 
 
+class CustomAuthenticationForm(AuthenticationForm):
+    username_or_matric = forms.CharField(label="Username (Staff) or Matric Number (Student)", max_length=50)
+
+
 class StudentApplicationForm2(forms.ModelForm):
     class Meta:
         model = StudentApplication
         #fields = ['posting_place']
-        fields = ['status']
+        fields = ['status', 'hod_recommendation_signature', 'date_signed']
         widgets = {
             'status': forms.Select(choices=StudentApplication.STATUS_CHOICES)
         }
@@ -93,11 +97,21 @@ class StudentApplicationForm2(forms.ModelForm):
 class StudentApplicationForm(forms.ModelForm):
     class Meta:
         model = StudentApplication
-        fields = ['posting_place']
+        #fields = ['posting_place']
         # fields = ['status']
         # widgets = {
         #     'status': forms.Select(choices=StudentApplication.STATUS_CHOICES)
         # }
+
+        fields = [
+            'posting_place', 'start_date', 'end_date', 'student_photo',
+            'room_number', 'cgpa', 'reason_for_desiring_to_work', 'signature', 'area_of_interest'
+        ]
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'date_signed': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 
 class PostingPlaceForm(forms.ModelForm):

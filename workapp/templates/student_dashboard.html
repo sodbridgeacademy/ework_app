@@ -6,18 +6,57 @@
 
 
 {% block content %}
-    <h4 style="color:green">Student Dashboard</h4> <hr>
-    <h6><em>***Welcome, {{ user.username }}***</em></h6>
-    <small>{{ user.first_name}}, {{ user.last_name }}</small><hr>  <br>
+    <div class="row">
+        <div class="col-6">
+            <h4 style="color:green">Student Dashboard</h4> <hr>
+            <h6><em>***Welcome, {{ user.first_name }}***</em></h6>
+            <small><b>Matric No:</b> {{ user.matric_number}}</small><br>
+            <small><b>Department:</b> {{ user.department }}</small>
+        </div>
+        <div class="col-6">
+            <h4 class="" style="margin-bottom: 45px;"></h4> <hr>
+            <!-- Display User Photo -->
+            <div class="user-photo" style="margin-left:50px; float: right;">
+                <img src="{{ user.applications.first.student_photo.url }}" alt="User Photo" class="img-thumbnail" 
+                style="width: 50px; height: 50px; border-radius: 100%;">
+            </div> 
+        </div>
+    </div>
+    <hr>  <br>
     <!-- Dashboard-specific content goes here -->
 
-       <!-- Applications Table -->
+    <!-- Personal & Academic Data -->
+    <div class="row">
+        <div class="col-6">
+            <h5 style="color:green">Personal Data</h5><hr>
+            <li><b>Full Name:</b> {{ user.first_name }}, {{ user.last_name}}</li>
+            <li><b>Gender:</b> {% if user.gender == 'M' %}Male{% else %}Female{% endif %}</li>
+            <li><b>Address:</b> {{ user.contact_address }}</li>
+            <li><b>Age:</b> {{ user_age }}</li>
+            <li><b>Phone Number:</b> {{ user.phone_number }}</li>
+        </div>
+        <div class="col-6">
+            <h5 style="color:green">Academic Data</h5><hr>
+            <li><b>Faculty:</b> {{ user.faculty }}, {{ user.last_name}}</li>
+            <li><b>Department:</b>{{ user.department }}</li>
+            <li><b>Matric No:</b> {{ user.matric_number }}</li>
+            <li><b>Email:</b> {{ user.email }}</li>
+        </div>
+    </div>
+    <br><br>
+
+
+
+    <!-- Applications Table -->
     <h5 style="color:green">My Applications</h5>
     {% if applications %}
     <table class="table">
         <thead>
             <tr>
                 <th>Posting Place</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>CGPA</th>
                 <th>Director Approval</th>
                 <th>Work Completed</th>
                 <th>Payment Status</th>
@@ -27,6 +66,9 @@
             {% for application in applications %}
             <tr>
                 <td>{{ application.posting_place.name }}</td>
+                <td>{{ application.start_date }}</td>
+                <td>{{ application.end_date }}</td>
+                <td>{{ application.cgpa }}</td>
                 <td>{{ application.get_status_display }}</td>
                 <td>{{ application.work_completed }}</td>
                 <td>{% if application.payment_status %}<span style="color:green">Paid</span>
@@ -42,7 +84,7 @@
     {% else %}
         <p style="color:red;">No applications submitted!</p><hr> <br>
          <!-- Application Form -->
-        <h5>Apply for a Posting Place</h5>
+        <h5>Apply for a Job Placement</h5>
         <form method="post">
             {% csrf_token %}
             {{ form|crispy }}
@@ -51,7 +93,7 @@
         <br> <br>
 
         <!-- Form for adding a new posting place -->
-    <h5>Posting Place Not In The List? Add One Now & Apply!</h5> <hr>
+    <h5>Job Placement Not In The List? Add One Now & Apply!</h5> <hr>
     <form method="post">
         {% csrf_token %}
         {{ posting_place_form|crispy }}
@@ -78,13 +120,12 @@
 
         <div class="col-6">
             <h5 style="color:green">Weekly Report Status</h5>
-            {% if work_status_count < max_submissions %}
+            {% if work_statuses_count < max_submissions %}
                 <form method="post" action="{% url 'submit_work_status' %}">
                     {% csrf_token %}
                     {{ work_status_form|crispy }}
                     <button type="submit" class="btn btn-info">Click Here To Send</button>
                 </form>
-                
             {% else %}
                 {% for application in applications %}
                     {% if  application.status != 'approved' %}

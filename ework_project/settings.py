@@ -116,6 +116,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# auth login
+AUTHENTICATION_BACKENDS = [
+    'workapp.backends.CustomAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 

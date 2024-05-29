@@ -2,20 +2,30 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
 	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
-	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm
+	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
 from datetime import date
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.utils import timezone
 
 
 # Create your views here.
 def index(request):
+    return render(request, 'index.html')
+
+def student_registration(request):
 	return redirect('register_student')
 
 
 def login(request):
     return render(request, 'login.html')
+
+
+class CustomLoginView(LoginView):
+    authentication_form = CustomAuthenticationForm
+    template_name = 'registration/login.html'
 
 
 def register_student(request):
@@ -74,8 +84,12 @@ def dashboard(request):
         work_statuses = WorkStatus.objects.filter(
             application__student=user).order_by('week_number')
         work_statuses_count = work_statuses.count()
-        print(f'work status count => {work_statuses_count}')
+        #print(f'work status count => {work_statuses_count}')
         max_submissions = 6
+        current_year = timezone.now().year
+        user_dob = user.date_of_birth.year
+        #print(f'cy => {current_year}')
+        user_age = current_year - user_dob
 
 
         if request.method == 'POST':
@@ -105,7 +119,7 @@ def dashboard(request):
         ctx = {'posting_places': posting_places, 'applications': applications, 
                 'form': application_form, 'posting_place_form':posting_place_form,
                  'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, \
-                    'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user}
+                    'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user, 'user_age':user_age}
 
         return render(request, 'student_dashboard.html', ctx)
     elif user.role == 'director':
