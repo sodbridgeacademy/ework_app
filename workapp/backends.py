@@ -11,7 +11,7 @@ class CustomAuthBackend(ModelBackend):
             if username.isdigit():
                 user = User.objects.get(matric_number=username)
             else:
-                user = User.objects.get(username=username)
+                user = User.objects.get(username=staff_id)
             
             if user.check_password(password):
                 return user

@@ -18,7 +18,7 @@ class StudentRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone_number', 'date_of_birth', 'gender', 'matric_number', 
+        fields = ['first_name', 'last_name', 'matric_number', 'email', 'phone_number', 'date_of_birth', 'gender', 
         'department', 'password1', 'password2']
 
 
@@ -38,13 +38,13 @@ class StudentRegistrationForm(UserCreationForm):
 class DirectorRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=100)
     last_name = forms.CharField(max_length=100)
-    department = forms.CharField(max_length=100)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    gender = forms.ChoiceField(choices=User.GENDER_CHOICES, required=False)
+    gender = forms.ChoiceField(choices=User.GENDER_CHOICES, required=True)
+    #department = forms.CharField(max_length=100)
+    #date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_of_birth', 'gender', 'department', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'staff_id', 'email', 'gender',  'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -65,14 +65,14 @@ class DirectorRegistrationForm(UserCreationForm):
 class SupervisorRegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=100)
     last_name = forms.CharField(max_length=100)
-    specialization = forms.CharField(max_length=100)
-    date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    #specialization = forms.CharField(max_length=100)
+    #date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     gender = forms.ChoiceField(choices=User.GENDER_CHOICES, required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'date_of_birth', 'gender', \
-             'specialization', 'password1', 'password2']
+        fields = ['first_name', 'last_name', 'staff_id', 'email', 'gender', \
+             'department', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
