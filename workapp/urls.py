@@ -8,6 +8,9 @@ urlpatterns = [
 	path('register/student/', views.register_student, name='register_student'),
 	path('register/director/', views.register_director, name='register_director'),
     path('register/supervisor/', views.register_supervisor, name='register_supervisor'),
+    path('reset/password/', views.CustomPasswordChangeView.as_view(), name='change_password'),
+    path('request_password_reset/', views.request_password_reset, name='request_password_reset'),
+    path('reset_password/<str:token>/', views.reset_password, name='reset_password'),
 
 	path('dashboard/', views.dashboard, name='dashboard'),
     path('submit-work/', views.submit_work_status, name='submit_work_status'),

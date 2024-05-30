@@ -7,8 +7,13 @@ from django.contrib.auth.decorators import login_required
 from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
 from datetime import date
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.contrib.auth.forms import SetPasswordForm
+
 
 
 # Create your views here.
@@ -26,6 +31,59 @@ def login(request):
 class CustomLoginView(LoginView):
     authentication_form = CustomAuthenticationForm
     template_name = 'registration/login.html'
+
+
+# Assuming a simple token storage mechanism (ideally should use Django's built-in tools)
+tokens = {}
+
+def request_password_reset(request):
+    ctx ={}
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        try:
+            user = User.objects.get(email=email)
+            print(f"user email => {user}")
+            token = get_random_string(20)
+            print(f"token => {token}")
+            tokens[email] = token  # Store token (in production, use a more secure method)
+            reset_url = request.build_absolute_uri(reverse('reset_password', args=[token]))
+            print(f'reset url => {reset_url}')
+            # Simulate sending email by displaying URL
+            messages.success(request, f'Reset link: {reset_url}')
+            ctx['reset_url'] = reset_url
+        except User.DoesNotExist:
+            ctx['error'] = 'User does not exist! Please, enter the correct email!'
+        #ctx = {'error':error, 'reset_url':reset_url}
+    return render(request, 'request_password_reset.html', ctx)
+
+
+
+def reset_password(request, token):
+    for email, stored_token in tokens.items():
+        if stored_token == token:
+            user = get_object_or_404(User, email=email)
+            if request.method == 'POST':
+                form = SetPasswordForm(user, request.POST)
+                if form.is_valid():
+                    form.save()
+                    del tokens[email]
+                    messages.success(request, 'Your password has been successfully reset.')
+                    return redirect('login')
+            else:
+                form = SetPasswordForm(user)
+            return render(request, 'reset_password.html', {'form': form})
+    messages.error(request, 'Invalid or expired token.')
+    return redirect('request_password_reset')
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'change_password.html'
+    success_url = reverse_lazy('login')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Your password was successfully updated!')
+        return super().form_valid(form)
 
 
 def register_student(request):

@@ -69,6 +69,7 @@ class StudentApplication(models.Model):
     hod_recommendation_signature = models.FileField(upload_to='hod_signatures/', default=default_hod_signature, null=True, blank=True)
     room_number = models.CharField(max_length=10, null=True, blank=True)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    year_of_study = models.IntegerField(null=True, blank=True, default=2024)
     reason_for_desiring_to_work = models.TextField(null=True, blank=True)
     signature = models.FileField(upload_to='signatures/', default=default_signature, null=True, blank=True)
     area_of_interest = models.CharField(max_length=255, null=True, blank=True)
