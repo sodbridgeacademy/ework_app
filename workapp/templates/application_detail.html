@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Application Detail{% endblock %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+
+    <h1>Your Application Detail</h1> <hr>
+    <p><strong>Application Post:</strong> {{ application.posting_place }}</p>
+    <p><strong>Supervisor:</strong> {{ supervisor_name }}</p>
+
+    {% if application.status == 'rejected' %}
+        <p><strong>Status:</strong> 
+            <span style="color:red;">{{ application.status }}</span> | <a class="btn btn-info" href="mailto:{{director.email}}">Contact director</a>
+    {% else %}
+        <p><strong>Status:</strong> {{ application.status }}
+
+        <p><strong>HOD Recommendation Letter:</strong> 
+        {% if application.hod_recommendation_letter %}
+        <a class="btn btn-info" href="{{ application.hod_recommendation_letter.url }}" target="_blank">View HOD Recommendation File</a>
+        <!-- <img src="{{ application.hod_recommendation_letter.url }}" alt="HOD Recommendation Signature" style="max-width: 200px; max-height: 200px;"> -->
+        {% else %}
+            <p>No HOD recommendation letter uploaded.</p>
+        {% endif %}
+    </p>
+
+    {% endif %}
+
+        
+
+
+    <!-- Add more details here as needed -->
+
+
+
+ {% endblock %}
+

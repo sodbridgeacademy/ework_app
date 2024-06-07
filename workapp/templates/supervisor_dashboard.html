@@ -21,12 +21,12 @@
         <li><strong>First Name:</strong> {{ user.first_name }}</li>
         <li><strong>Last Name:</strong> {{ user.last_name }}</li>
         <li><strong>Email:</strong>{% if user.email %} {{ user.email }} {% else %} None {% endif %}</li>
-        <li><strong>Specialization:</strong>{{ user.specialization }}</li>
+        <!-- <li><strong>Specialization:</strong>{{ user.specialization }}</li> -->
     </ul> <br><br>
     
 
     <!-- Students Assigned to Posting Place -->
-    <h5 style="color:blue;">Students Applications To  Your Work Post</h5> <hr>
+    <h5 style="color:blue;">Students Applications To  Your Department</h5> <hr>
     {% if students %}
         <table class="table">
             <thead>

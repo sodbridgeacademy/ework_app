@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Case, When, Value, IntegerField
 from django.contrib.auth.models import AbstractUser
 from datetime import date
 from django.utils import timezone
@@ -12,10 +13,12 @@ class User(AbstractUser):
         ('supervisor', 'Supervisor'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    username = models.CharField(max_length=20, null=True, blank=True, default='new_user')
     matric_number = models.CharField(max_length=20, null=True, blank=True, unique=True)
-    staff_id = models.CharField(max_length=10, null=True, blank=False, unique=True)
+    staff_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     email = models.EmailField(null=True, blank=False, unique=True)
     department = models.CharField(max_length=100, null=True, blank=False)
+    course_of_study = models.CharField(max_length=100, null=True, blank=False)
     faculty = models.CharField(max_length=100, null=True, blank=True, default='Science')
     specialization = models.CharField(max_length=100, null=True, blank=True)
     first_name = models.CharField(max_length=100)
@@ -30,11 +33,29 @@ class User(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     registration_date = models.DateField(default=date.today)
 
+    def save(self, *args, **kwargs):
+        creating = self._state.adding
+        super(User, self).save(*args, **kwargs)
+        if creating and self.role == 'supervisor':
+            # Create a PostingPlace when a new supervisor is created
+            PostingPlace.objects.create(name=self.department, supervisor=self)
+
+    def __str__(self):
+        return f'{self.first_name}, {self.username}'
+
 
 class PostingPlace(models.Model):
     name = models.CharField(max_length=100)
-    location = models.CharField(max_length=100, null=True, blank=True)
-    supervisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='supervised_places', null=True, blank=True)
+    location = models.CharField(max_length=100, null=True, blank=True, default='School Campus')
+    supervisor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.id:  # if the instance is being created
+    #         supervisor_user = User.objects.filter(role='supervisor').first()
+    #         if supervisor_user:
+    #             self.supervisor = supervisor_user
+    #     super(PostingPlace, self).save(*args, **kwargs)
+
 
     def __str__(self):
         return self.name
@@ -67,10 +88,10 @@ class StudentApplication(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     student_photo = models.ImageField(upload_to='student_photos/', default=default_student_photo, null=True, blank=True)
-    hod_recommendation_signature = models.FileField(upload_to='hod_signatures/', default=default_hod_signature, null=True, blank=True)
-    room_number = models.CharField(max_length=10, null=True, blank=True)
+    hod_recommendation_letter = models.FileField(upload_to='hod_signatures/', default=default_hod_signature, null=True, blank=True)
+    room_number = models.CharField(max_length=20, null=True, blank=True)
     cgpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
-    year_of_study = models.IntegerField(null=True, blank=True, default=2024)
+    year_of_study = models.IntegerField(null=True, blank=True)
     reason_for_desiring_to_work = models.TextField(null=True, blank=True)
     signature = models.FileField(upload_to='signatures/', default=default_signature, null=True, blank=True)
     area_of_interest = models.CharField(max_length=255, null=True, blank=True)
@@ -79,14 +100,23 @@ class StudentApplication(models.Model):
     def __str__(self):
         return f"{self.student.username} - {self.posting_place.name}"
 
+    class Meta:
+        ordering = [Case(
+            When(status='pending', then=Value(0)),
+            When(status='approved', then=Value(1)),
+            When(status='rejected', then=Value(2)),
+            output_field=IntegerField(),
+        )]
+
 
 
 class WorkStatus(models.Model):
     application = models.ForeignKey(StudentApplication, on_delete=models.CASCADE, related_name='work_statuses', null=True)
     week_number = models.IntegerField()
     student_checked = models.BooleanField(default=False)
+    student_checked_date = models.DateTimeField(null=True)
     supervisor_checked = models.BooleanField(default=False)
-    checked_date = models.DateTimeField(default=timezone.now)
+    checked_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return f"Week {self.week_number} - {self.application.student.username} - {self.supervisor_checked}"

@@ -22,5 +22,6 @@ urlpatterns = [
     path('approve_work_status/<int:student_id>/<int:week_number>/', views.approve_work_status, name='approve_work_status'),
     path('update_posting_place/<int:posting_place_id>/', views.update_posting_place, name='update_posting_place'),
     path('add_bank_details/', views.add_bank_details, name='add_bank_details'),
+    path('application/<int:application_id>/', views.application_detail, name='application_detail'),
    
 ]

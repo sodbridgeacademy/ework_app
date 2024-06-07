@@ -18,7 +18,7 @@
             <!-- Display User Photo -->
             <div class="user-photo" style="margin-left:50px; float: right;">
                 <img src="{{ user.applications.first.student_photo.url }}" alt="User Photo" class="img-thumbnail" 
-                style="width: 50px; height: 50px; border-radius: 100%;">
+                style="width: 70px; height: 70px; border-radius: 100%;">
             </div> 
         </div>
     </div>
@@ -56,11 +56,11 @@
             <tr>
                 <th>Posting Place</th>
                 <th>Start Date</th>
-                <th>End Date</th>
                 <th>CGPA</th>
                 <th>Director Approval</th>
                 <th>Work Completed</th>
                 <th>Payment Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -68,12 +68,12 @@
             <tr>
                 <td>{{ application.posting_place.name }}</td>
                 <td>{{ application.start_date }}</td>
-                <td>{{ application.end_date }}</td>
                 <td>{{ application.cgpa }}</td>
                 <td>{{ application.get_status_display }}</td>
                 <td>{{ application.work_completed }}</td>
                 <td>{% if application.payment_status %}<span style="color:green">Paid</span>
                     {% else %}<span style="color:red">Unpaid</span>{% endif %}</td>
+                <td><a class="btn btn-info" href="{% url 'application_detail' application.id %}">View</a></td>
             </tr>
             {% empty %}
             <tr>
@@ -86,9 +86,9 @@
         <p style="color:red;">No applications submitted!</p><hr> <br>
          <!-- Application Form -->
         <h5>Apply for a Job Placement</h5>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form|crispy }}
+            {{ application_form|crispy }}
             <button type="submit" name="apply_place" class="btn btn-info">Submit Application</button>
         </form>
         <br> <br>
@@ -121,26 +121,36 @@
 
         <div class="col-6">
             <h5 style="color:green">Weekly Report Status</h5>
-            {% if work_statuses_count < max_submissions %}
-                <form method="post" action="{% url 'submit_work_status' %}">
-                    {% csrf_token %}
-                    {{ work_status_form|crispy }}
-                    <button type="submit" class="btn btn-info">Click Here To Send</button>
-                </form>
-            {% else %}
+            
+            {% if applications %}
                 {% for application in applications %}
-                    {% if  application.status != 'approved' %}
+                    {% if  application.status == 'pending' %}
                         <p style="color:red;">Oops! Your application hasn't been approved yet!</p>
-                {% else %}
-                <p style="color:red;">You have reached the maximum number of weekly submissions ({{ max_submissions }}).</p>
+                    {% else %}
+                        {% if  application.status == 'rejected' %}
+                            <p style="color:red;">Sorry! Your application has been rejected!</p>
+                    {% else %}
+                        {% if work_statuses_count < max_submissions %}
+                            <form method="post" action="{% url 'submit_work_status' %}">
+                                {% csrf_token %}
+                                {{ work_status_form|crispy }}
+                                <button type="submit" class="btn btn-info">Click Here To Send</button>
+                            </form>
+                        {% else %}
+                            <p style="color:red;">You have reached the maximum number of weekly submissions ({{ max_submissions }}).</p>
+                        {% endif %}
+                    {% endif %}
                     {% endif %}
                 {% endfor %}
-
+                
+            {% else %}
+                <p style="color:red;">You have no application!</p>
             {% endif %}
         </div>
     </div>
     
     <br><br><br>
+   
 
 
     <!-- Table to display work status -->
@@ -150,7 +160,9 @@
             <tr>
                 <th>Week</th>
                 <th>Student Check</th>
+                <th>Date Submitted</th>
                 <th>Supervisor Approval</th>
+                <th>Date Approved</th>
             </tr>
         </thead>
         <tbody>
@@ -158,7 +170,10 @@
             <tr>
                 <td>{{ status.week_number }}</td>
                 <td>{{ status.student_checked }}</td>
+                <td>{{ status.student_checked_date }}</td>
                 <td>{{ status.supervisor_checked }}</td>
+                <td>{{ status.checked_date }}</td>
+
             </tr>
             {% empty %}
             <tr>

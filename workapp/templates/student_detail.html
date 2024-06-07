@@ -3,7 +3,9 @@
 {% block title %}{{ student.username }}'s Details{% endblock %}
 
 {% block content %}
-    <h4 style="color:green"> {{ student.first_name }} {{ student.last_name }} Details</h4><hr><br> <br>
+    <h4 style="color:green"> {{ student.first_name }} {{ student.last_name }} Details</h4>
+    <small><b>Matric no:</b> {{ student.matric_number }}</small>
+    <hr><br> <br>
     
     <!-- Bank Details -->
     <h5 style="color:green">Bank Details</h5><hr>

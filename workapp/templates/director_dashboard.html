@@ -43,12 +43,12 @@
 
     
     <!-- Add Posting Place Form -->
-    <h5 style="color:red">Add New Posting Place</h5> <hr>
+    <!-- <h5 style="color:red">Add New Posting Place</h5> <hr>
     <form method="post">
         {% csrf_token %}
         {{ place_form|crispy }}
         <button type="submit" class="btn btn-info">Add Posting Place</button>
-    </form> <br><br>
+    </form> <br><br> -->
     
     <!-- List of Student Applications -->
     <h5 style="color:red">Student Applications</h5> <hr>
@@ -89,7 +89,7 @@
             <h5 style="color:blue;">Supervisors</h5>
             <ul>
                 {% for supervisor in supervisors %}
-                <li><a href="{% url 'supervisor_detail' supervisor.pk %}">{{ supervisor.username }}</a></li>
+                <li><a href="{% url 'supervisor_detail' supervisor.pk %}">{{ supervisor.first_name }}, {{ supervisor.last_name }}</a></li>
                 {% empty %}
                 <li>No supervisors found</li>
                 {% endfor %}

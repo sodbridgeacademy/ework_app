@@ -14,7 +14,7 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.contrib.auth.forms import SetPasswordForm
 
-
+# 2378123460, 202498765 (eliz1234), 20982389 (adex)
 
 # Create your views here.
 def index(request):
@@ -139,6 +139,8 @@ def dashboard(request):
     if user.role == 'student':
         posting_places = PostingPlace.objects.all()
         applications = StudentApplication.objects.filter(student=request.user)
+        app_count = applications.count()
+        print(f"application for {user} => {app_count}")
         work_statuses = WorkStatus.objects.filter(
             application__student=user).order_by('week_number')
         work_statuses_count = work_statuses.count()
@@ -151,14 +153,17 @@ def dashboard(request):
 
 
         if request.method == 'POST':
-            application_form = StudentApplicationForm(request.POST)
+            application_form = StudentApplicationForm(request.POST, request.FILES)
             posting_place_form = PostingPlaceForm2(request.POST)
             if 'apply_place' in request.POST:
                 if application_form.is_valid():
+                    print(f"student photo => {application_form}")
                     application = application_form.save(commit=False)
                     application.student = request.user
                     application.save()
                     return redirect('dashboard')
+                else:
+                    print('errors =>', application_form.errors)
             elif 'add_post_place' in request.POST:
                 if posting_place_form.is_valid():
                     posting_place_form.save()
@@ -175,7 +180,7 @@ def dashboard(request):
             bank_detail = None
 
         ctx = {'posting_places': posting_places, 'applications': applications, 
-                'form': application_form, 'posting_place_form':posting_place_form,
+                'application_form': application_form, 'posting_place_form':posting_place_form, 'app_count':app_count,
                  'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, \
                     'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user, 'user_age':user_age}
 
@@ -235,6 +240,17 @@ def dashboard(request):
     else:
         # Handle other cases (optional)
         return render(request, 'other_dashboard.html')
+
+
+
+@login_required
+def application_detail(request, application_id):
+    application = get_object_or_404(StudentApplication, id=application_id, student=request.user)
+    director = User.objects.filter(role='director')
+    supervisor_name = application.posting_place.supervisor.first_name if application.posting_place.supervisor else 'Supervisor not found!'
+    #supervisor_name = application.posting_place.supervised_places.first().username if application.posting_place else 'No supervisor'
+    return render(request, 'application_detail.html', {'application': application, 'supervisor_name': supervisor_name, 'director':director})
+
 
 
 @login_required

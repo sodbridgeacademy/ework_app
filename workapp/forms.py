@@ -19,7 +19,7 @@ class StudentRegistrationForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'matric_number', 'email', 'phone_number', 'date_of_birth', 'gender', 
-        'department', 'password1', 'password2']
+        'department', 'faculty', 'password1', 'password2']
 
 
     def __init__(self, *args, **kwargs):
@@ -44,7 +44,7 @@ class DirectorRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'staff_id', 'email', 'gender',  'password1', 'password2']
+        fields = ['first_name', 'last_name', 'staff_id', 'email', 'gender', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,7 +88,7 @@ class StudentApplicationForm2(forms.ModelForm):
     class Meta:
         model = StudentApplication
         #fields = ['posting_place']
-        fields = ['status', 'hod_recommendation_signature', 'date_signed']
+        fields = ['status', 'signature', 'date_signed']
         widgets = {
             'status': forms.Select(choices=StudentApplication.STATUS_CHOICES)
         }
@@ -104,8 +104,8 @@ class StudentApplicationForm(forms.ModelForm):
         # }
 
         fields = [
-            'posting_place', 'start_date', 'end_date', 'student_photo',
-            'room_number', 'cgpa', 'reason_for_desiring_to_work', 'signature', 'area_of_interest'
+            'posting_place', 'student_photo', 'room_number', 'cgpa',  'year_of_study',
+            'reason_for_desiring_to_work', 'hod_recommendation_letter'
         ]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
@@ -153,7 +153,7 @@ class BankDetailsForm(forms.ModelForm):
 class WorkStatusForm(forms.ModelForm):
     class Meta:
         model = WorkStatus
-        fields = ['week_number', 'student_checked']
+        fields = ['week_number', 'student_checked', 'student_checked_date']
 
 
 class SupervisorWorkStatusForm(forms.ModelForm):

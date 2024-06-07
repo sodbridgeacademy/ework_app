@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
 
+        {% load static %}
+
         {% load crispy_forms_tags %}
 
         {% block content %}
-            <div class="col-6" style="margin: auto;">
+        <div class="row">
+            <div class="col-4">
+                <img src="{% static 'images/crawfor_uni.jpeg' %}" style="width: 90%; display: flex; margin:25px;" alt="crawford_uni image" class="img-fluid mt-15"> <br> <hr> <br>
+                <img src="{% static 'images/crawford_uni.jpeg' %}" style="width:90%; height:400px; display: flex; margin:25px;" alt="crawford_uni image" class="img-fluid mt-15">
+            </div>
+
+            <div class="col-8" style="margin: auto;">
                 <h1>Register as a Student</h1>
                 <form method="post">
                     {% csrf_token %}
@@ -18,5 +26,7 @@
                     </small> <br>
                 </div>
              </div>
+            
+        </div>
              
         {% endblock %}
