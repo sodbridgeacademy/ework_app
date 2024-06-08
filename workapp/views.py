@@ -142,7 +142,7 @@ def dashboard(request):
         app_count = applications.count()
         print(f"application for {user} => {app_count}")
         work_statuses = WorkStatus.objects.filter(
-            application__student=user).order_by('week_number')
+            application__student=user).order_by('day')
         work_statuses_count = work_statuses.count()
         #print(f'work status count => {work_statuses_count}')
         max_submissions = 6
@@ -221,7 +221,7 @@ def dashboard(request):
             students = User.objects.filter(applications__posting_place=posting_place).distinct()
             #print(f'students posted to your ppa => {students.applications}')
             work_statuses = WorkStatus.objects.filter(
-                application__posting_place__supervisor=user).order_by('week_number')
+                application__posting_place__supervisor=user).order_by('day')
 
 	    	# Attach work statuses to each student
             for student in students:
@@ -330,7 +330,7 @@ def make_payment(request, student_id):
 
 
 @login_required
-def approve_work_status(request, student_id, week_number):
+def approve_work_status(request, student_id, day):
     user = request.user
     if user.role != 'supervisor':
         print('Not a supervisor!')
@@ -349,14 +349,14 @@ def approve_work_status(request, student_id, week_number):
         messages.error(request, 'No approved application found for this student at your posting place.')
         return redirect('dashboard')
     
-    work_status, created = WorkStatus.objects.get_or_create(application=application, week_number=week_number)
+    work_status, created = WorkStatus.objects.get_or_create(application=application, day=day)
     
     if request.method == 'POST':
-        work_status.supervisor_checked = True
+        work_status.supervisor_approval = True
         work_status.save()
         
         # Check if all weeks are approved by both student and supervisor
-        all_weeks_checked = WorkStatus.objects.filter(application=application, student_checked=True, supervisor_checked=True).count()
+        all_weeks_checked = WorkStatus.objects.filter(application=application, student_checked=True, supervisor_approval=True).count()
         if all_weeks_checked == 6:
             application.work_completed = True
             application.save()
@@ -364,7 +364,7 @@ def approve_work_status(request, student_id, week_number):
         elif all_weeks_checked > 6:
             messages.success(request, 'Total number of weeks reached!')
         else:
-            messages.success(request, f'Work status for week {week_number} approved.')
+            messages.success(request, f'Work status for week {day} approved.')
         
         return redirect('dashboard')
     ctx =  {'work_status': work_status, 'week_number': week_number, 'student': student}

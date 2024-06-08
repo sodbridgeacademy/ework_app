@@ -51,37 +51,39 @@
     <!-- Applications Table -->
     <h5 style="color:green">My Applications</h5>
     {% if applications %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Posting Place</th>
-                <th>Start Date</th>
-                <th>CGPA</th>
-                <th>Director Approval</th>
-                <th>Work Completed</th>
-                <th>Payment Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for application in applications %}
-            <tr>
-                <td>{{ application.posting_place.name }}</td>
-                <td>{{ application.start_date }}</td>
-                <td>{{ application.cgpa }}</td>
-                <td>{{ application.get_status_display }}</td>
-                <td>{{ application.work_completed }}</td>
-                <td>{% if application.payment_status %}<span style="color:green">Paid</span>
-                    {% else %}<span style="color:red">Unpaid</span>{% endif %}</td>
-                <td><a class="btn btn-info" href="{% url 'application_detail' application.id %}">View</a></td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No applications submitted</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive"> 
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Posting Place</th>
+                    <th>Start Date</th>
+                    <th>CGPA</th>
+                    <th>Director Approval</th>
+                    <th>Work Completed</th>
+                    <th>Payment Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                <tr>
+                    <td>{{ application.posting_place.name }}</td>
+                    <td>{{ application.start_date }}</td>
+                    <td>{{ application.cgpa }}</td>
+                    <td>{{ application.get_status_display }}</td>
+                    <td>{{ application.work_completed }}</td>
+                    <td>{% if application.payment_status %}<span style="color:green">Paid</span>
+                        {% else %}<span style="color:red">Unpaid</span>{% endif %}</td>
+                    <td><a class="btn btn-info" href="{% url 'application_detail' application.id %}">View</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No applications submitted</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
         <p style="color:red;">No applications submitted!</p><hr> <br>
          <!-- Application Form -->
@@ -155,32 +157,37 @@
 
     <!-- Table to display work status -->
     <h5 style="color:green">Your Weekly Report Status</h5>
-    <table class="table dark">
-        <thead>
-            <tr>
-                <th>Week</th>
-                <th>Student Check</th>
-                <th>Date Submitted</th>
-                <th>Supervisor Approval</th>
-                <th>Date Approved</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for status in work_statuses %}
-            <tr>
-                <td>{{ status.week_number }}</td>
-                <td>{{ status.student_checked }}</td>
-                <td>{{ status.student_checked_date }}</td>
-                <td>{{ status.supervisor_checked }}</td>
-                <td>{{ status.checked_date }}</td>
+    <div class="table-responsive">        
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Supervisor Name</th>
+                    <th>Comments</th>
+                     <th>Supervisor Approval</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for status in work_statuses %}
+                <tr>
+                    <td>{{ status.day }}</td>
+                    <td>{{ status.date }}</td>
+                    <td>{{ status.time }}</td>
+                    <td>{{ status.supervisor_name }}</td>
+                    <td>{{ status.comments }}</td>
+                    <td>{{ status.supervisor_approval }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No work status entries found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table> 
+    </div>
 
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No work status entries found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table> <br><br>
+    <br><br>
 
  {% endblock %}

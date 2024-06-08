@@ -153,10 +153,10 @@ class BankDetailsForm(forms.ModelForm):
 class WorkStatusForm(forms.ModelForm):
     class Meta:
         model = WorkStatus
-        fields = ['week_number', 'student_checked', 'student_checked_date']
+        fields = ['date', 'day', 'time', 'supervisor_name', 'student_checked', 'comments']
 
 
 class SupervisorWorkStatusForm(forms.ModelForm):
     class Meta:
         model = WorkStatus
-        fields = ['supervisor_checked']
+        fields = ['supervisor_name']

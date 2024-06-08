@@ -112,14 +112,17 @@ class StudentApplication(models.Model):
 
 class WorkStatus(models.Model):
     application = models.ForeignKey(StudentApplication, on_delete=models.CASCADE, related_name='work_statuses', null=True)
-    week_number = models.IntegerField()
+    date = models.DateField()
+    day = models.CharField(max_length=20, null=True)
+    time = models.CharField(max_length=20, null=True)
+    supervisor_name = models.CharField(max_length=50, null=True)
     student_checked = models.BooleanField(default=False)
-    student_checked_date = models.DateTimeField(null=True)
-    supervisor_checked = models.BooleanField(default=False)
-    checked_date = models.DateTimeField(null=True)
+    #student_checked_date = models.DateTimeField(null=True)
+    supervisor_approval = models.BooleanField(default=False)
+    comments = models.TextField(null=True)
 
     def __str__(self):
-        return f"Week {self.week_number} - {self.application.student.username} - {self.supervisor_checked}"
+        return f"{self.day}: {self.application.student.username},{self.student_checked}, {self.comments} =>  {self.supervisor_approval} "
 
 
 class BankDetails(models.Model):
