@@ -13,8 +13,9 @@ class User(AbstractUser):
         ('supervisor', 'Supervisor'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    username = models.CharField(max_length=20, null=True, blank=True, default='new_user')
+    username = models.CharField(max_length=20, null=True, blank=True, unique=False, default='new_user')
     matric_number = models.CharField(max_length=20, null=True, blank=True, unique=True)
+    #year_of_study = models.CharField(max_length=20, null=True, blank=True)
     staff_id = models.CharField(max_length=10, null=True, blank=True, unique=True)
     email = models.EmailField(null=True, blank=False, unique=True)
     department = models.CharField(max_length=100, null=True, blank=False)
@@ -41,7 +42,7 @@ class User(AbstractUser):
             PostingPlace.objects.create(name=self.department, supervisor=self)
 
     def __str__(self):
-        return f'{self.first_name}, {self.username}'
+        return f'{self.first_name} {self.last_name}'
 
 
 class PostingPlace(models.Model):

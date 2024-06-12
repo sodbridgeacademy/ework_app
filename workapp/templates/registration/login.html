@@ -12,11 +12,29 @@
             <div class="card">
                 <div class="card-header">{{ block.super }}</div>
                 <div class="card-body">
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        {{ form|crispy }}
+                  
+                    <form method="post" novalidate style="text-align:center;">
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                <label for="id_username"><b>Matric No/Staff ID</b></label> <br>
+                                {{ form.username }}
+                            </div>
+                            <div class="form-group">
+                                <label for="user_type"><b>Member Type</b></label> <br>
+                                <select name="role" class="form-group" id="role" required>
+                                    <option value="student">Student</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="director">Director</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="id_password"><b>Password</b></label> <br>
+                                {{ form.password }}
+                            </div>
                         <button type="submit" class="btn btn-info">Login</button>
                     </form>
+
                 </div>
             </div>
 
@@ -28,3 +46,27 @@
     </div>
 </div>
 {% endblock %}
+
+  <form method="post">
+                            {% csrf_token %}
+                            <span style="color:red">{{ form.non_field_errors }}</span>
+                            <div class="form-group">
+                                <label for="username">Username (Staff ID or Matric Number)</label>
+                                <input type="text" name="username" class="form-control" id="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_type">User Type</label>
+                                <select name="role" class="form-control" id="role" required>
+                                    <option name="role" value="student">Student</option>
+                                    <option name="role" value="supervisor">Supervisor</option>
+                                    <option name="role" value="director">Director</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" class="form-control" id="password" required>
+                            </div>
+                            <button type="submit" class="btn btn-info">Login</button>
+                        </form>
+
+

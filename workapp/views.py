@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
 	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
 	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm
@@ -28,9 +28,57 @@ def login(request):
     return render(request, 'login.html')
 
 
+def custom_login(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            print('inside the new login view')
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user_type = form.cleaned_data.get('role')
+            print(f'user type => {user_type}')
+            print(f'user deet => {username}')
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None and user.role == user_type:
+                login(request, user)
+                messages.success(request, f"Welcome {user.username}, you are logged in as a {user_type}.")
+                return redirect('dashboard')  # Redirect to the dashboard or appropriate page
+            else:
+                messages.error(request, "Invalid username, password, or user type.")
+        else:
+            messages.error(request, "Invalid username or password.")
+    else:
+        form = CustomAuthenticationForm()
+    
+    return render(request, 'registration/login.html', {'form': form})
+
+
 class CustomLoginView(LoginView):
+    print('inside the original login view1')
     authentication_form = CustomAuthenticationForm
+    #authentication_form = 1
     template_name = 'registration/login.html'
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        role = form.cleaned_data.get('role')
+        print(f"Form Data: username={username}, role={role}")
+        
+        user = authenticate(self.request, username=username, password=password, role=role)
+        
+        if user is not None:
+            login(self.request, user)
+            messages.success(self.request, f"Welcome {user.username}, you are logged in as a {role}.")
+            return redirect('dashboard')  # Redirect to the dashboard or appropriate page
+        else:
+            messages.error(self.request, "Invalid username, password, or user type.")
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "Invalid login credentials")
+        return super().form_invalid(form)
 
 
 # Assuming a simple token storage mechanism (ideally should use Django's built-in tools)
@@ -132,6 +180,7 @@ def register_supervisor(request):
     return render(request, 'register_supervisor.html', {'form': form})
 
 
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -139,8 +188,9 @@ def dashboard(request):
     if user.role == 'student':
         posting_places = PostingPlace.objects.all()
         applications = StudentApplication.objects.filter(student=request.user)
+        latest_application = applications.latest('start_date') if applications.exists() else None
         app_count = applications.count()
-        print(f"application for {user} => {app_count}")
+        print(f"application for {user} => {applications}")
         work_statuses = WorkStatus.objects.filter(
             application__student=user).order_by('day')
         work_statuses_count = work_statuses.count()
@@ -181,7 +231,7 @@ def dashboard(request):
 
         ctx = {'posting_places': posting_places, 'applications': applications, 
                 'application_form': application_form, 'posting_place_form':posting_place_form, 'app_count':app_count,
-                 'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, \
+                 'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, 'latest_application': latest_application,\
                     'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user, 'user_age':user_age}
 
         return render(request, 'student_dashboard.html', ctx)

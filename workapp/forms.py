@@ -80,8 +80,30 @@ class SupervisorRegistrationForm(UserCreationForm):
         self.fields['password2'].help_text = None
 
 
+
+class AACustomAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        label="Username/Matric No/Staff ID",
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter Username/Matric No/Staff ID'})
+    )
+    USER_TYPE_CHOICES = [
+        ('student', 'Student'),
+        ('supervisor', 'Supervisor'),
+        ('director', 'Director')
+    ]
+    role = forms.ChoiceField(choices=USER_TYPE_CHOICES, label='User Type', required=True)
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Password'})
+    )
+
+
+
 class CustomAuthenticationForm(AuthenticationForm):
-    username_or_matric = forms.CharField(label="Username (Staff) or Matric Number (Student)", max_length=50)
+    username = forms.CharField(label="Username (Staff ID or Matric Number)", max_length=50)
+    role = forms.ChoiceField(label="User Type", choices=[('student', 'Student'), ('supervisor', 'Supervisor'), ('director', 'Director')])
+
 
 
 class StudentApplicationForm2(forms.ModelForm):

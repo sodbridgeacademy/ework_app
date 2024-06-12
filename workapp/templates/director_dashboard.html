@@ -8,7 +8,7 @@
 {% block content %}
     <h4 style="color:red">Director Dashboard</h4>
     <hr>
-    <h6><em>***Welcome, {{ user.username }}***</em></h6><hr> <br><br>
+    <h6><em>***Welcome, {{ user.first_name }}, {{ user.last_name }}***</em></h6><hr> <br><br>
 
 
     <!-- List of Posting Places -->
@@ -89,7 +89,7 @@
             <h5 style="color:blue;">Supervisors</h5>
             <ul>
                 {% for supervisor in supervisors %}
-                <li><a href="{% url 'supervisor_detail' supervisor.pk %}">{{ supervisor.first_name }}, {{ supervisor.last_name }}</a></li>
+                <li><a href="{% url 'supervisor_detail' supervisor.pk %}">{{ supervisor.first_name }} {{ supervisor.last_name }}</a></li>
                 {% empty %}
                 <li>No supervisors found</li>
                 {% endfor %}
@@ -101,7 +101,7 @@
             <h5 style="color:green;">Students</h5>
             <ul>
                 {% for student in students %}
-                <li><a href="{% url 'student_detail' student.pk %}">{{ student.username }} - {{ student.first_name }} {{ student.last_name }}</a></li>
+                <li><a href="{% url 'student_detail' student.pk %}">{{ student.first_name }} {{ student.last_name }}</a></li>
                 {% empty %}
                 <li>No students found</li>
                 {% endfor %}

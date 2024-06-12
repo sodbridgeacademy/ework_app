@@ -37,11 +37,15 @@
         </div>
         <div class="col-6">
             <h5 style="color:green">Academic Data</h5><hr>
-            <li><b>Faculty:</b> {{ user.faculty }}, {{ user.last_name}}</li>
+            <li><b>Faculty:</b> {{ user.faculty }}</li>
             <li><b>Department:</b>{{ user.department }}</li>
             <li><b>Matric No:</b> {{ user.matric_number }}</li>
             <li><b>Email:</b> {{ user.email }}</li>
-            <li><b>Year of Study:</b> 2024</li>
+            {% if latest_application %}
+                <li><strong>Year of Study:</strong> {{ latest_application.year_of_study }}</li>
+            {% else %}
+                <li><strong>Year of Study:</strong> NA</li>
+            {% endif %}
         </div>
     </div>
     <br><br>
@@ -56,7 +60,7 @@
             <thead>
                 <tr>
                     <th>Posting Place</th>
-                    <th>Start Date</th>
+                    <th>Supervisor</th>
                     <th>CGPA</th>
                     <th>Director Approval</th>
                     <th>Work Completed</th>
@@ -68,7 +72,7 @@
                 {% for application in applications %}
                 <tr>
                     <td>{{ application.posting_place.name }}</td>
-                    <td>{{ application.start_date }}</td>
+                    <td>{{ application.posting_place.supervisor }}</td>
                     <td>{{ application.cgpa }}</td>
                     <td>{{ application.get_status_display }}</td>
                     <td>{{ application.work_completed }}</td>
