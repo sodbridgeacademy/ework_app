@@ -195,7 +195,7 @@ def dashboard(request):
             application__student=user).order_by('day')
         work_statuses_count = work_statuses.count()
         #print(f'work status count => {work_statuses_count}')
-        max_submissions = 6
+        max_submissions = 8
         current_year = timezone.now().year
         user_dob = user.date_of_birth.year
         #print(f'cy => {current_year}')
@@ -314,6 +314,7 @@ def update_application_status(request, application_id):
     else:
         form = StudentApplicationForm2(instance=application)
     return render(request, 'update_application_status.html', {'form': form, 'application': application})
+    
 
 
 @login_required
@@ -407,11 +408,11 @@ def approve_work_status(request, student_id, day):
         
         # Check if all weeks are approved by both student and supervisor
         all_weeks_checked = WorkStatus.objects.filter(application=application, student_checked=True, supervisor_approval=True).count()
-        if all_weeks_checked == 6:
+        if all_weeks_checked == 8:
             application.work_completed = True
             application.save()
             messages.success(request, 'All weeks approved. Work completed.')
-        elif all_weeks_checked > 6:
+        elif all_weeks_checked > 8:
             messages.success(request, 'Total number of weeks reached!')
         else:
             messages.success(request, f'Work status for week {day} approved.')
@@ -437,6 +438,19 @@ def submit_work_status(request):
     else:
         form = WorkStatusForm()
     return render(request, 'submit_work_status.html', {'form': form})
+
+
+def supervisor_work_status_update(request, pk):
+    work_status = get_object_or_404(WorkStatus, pk=pk)
+    if request.method == 'POST':
+        form = SupervisorWorkStatusForm(request.POST, instance=work_status)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Work status updated successfully.')
+            return redirect('dashboard')
+    else:
+        form = SupervisorWorkStatusForm(instance=work_status)
+    return render(request, 'supervisor_work_status_update.html', {'form': form, 'work_status': work_status})
 
 
 

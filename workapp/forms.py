@@ -112,7 +112,11 @@ class StudentApplicationForm2(forms.ModelForm):
         #fields = ['posting_place']
         fields = ['status', 'signature', 'date_signed']
         widgets = {
-            'status': forms.Select(choices=StudentApplication.STATUS_CHOICES)
+            'status': forms.Select(choices=StudentApplication.STATUS_CHOICES),
+            'date_signed': forms.DateInput(attrs={
+                'placeholder': 'YYYY-MM-DD',
+                'class': 'form-control'
+            }),
         }
 
 
@@ -147,10 +151,12 @@ class PostingPlaceForm(forms.ModelForm):
         self.fields['supervisor'].queryset = User.objects.filter(role='supervisor')
 
 
+
 class PostingPlaceForm2(forms.ModelForm):
     class Meta:
         model = PostingPlace
         fields = ['name', 'location']
+
 
 
 class UpdatePostingPlaceForm(forms.ModelForm):
@@ -175,10 +181,24 @@ class BankDetailsForm(forms.ModelForm):
 class WorkStatusForm(forms.ModelForm):
     class Meta:
         model = WorkStatus
-        fields = ['date', 'day', 'time', 'supervisor_name', 'student_checked', 'comments']
+        fields = ['date', 'day', 'start_time', 'end_time', 'comments']
+
+        widgets = {
+            'date': forms.DateInput(attrs={
+                'placeholder': 'YYYY-MM-DD',
+                'class': 'form-control'
+            }),
+            'start_time':forms.TextInput(attrs=
+                {'placeholder':'E.g. 8am',
+                'class': 'form-control'
+                }),
+            'end_time':forms.TextInput(attrs=
+                {'placeholder':'E.g. 3pm'
+                }),
+        }
 
 
 class SupervisorWorkStatusForm(forms.ModelForm):
     class Meta:
         model = WorkStatus
-        fields = ['supervisor_name']
+        fields = ['supervisor_comment']

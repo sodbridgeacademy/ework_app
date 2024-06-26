@@ -167,10 +167,12 @@
                 <tr>
                     <th>Day</th>
                     <th>Date</th>
-                    <th>Time</th>
-                    <th>Supervisor Name</th>
+                    <th>Start time</th>
+                    <th>End time</th>
                     <th>Comments</th>
-                     <th>Supervisor Approval</th>
+                    <!-- <th>Supervisor</th> -->
+                    <th>Supervisor Approval</th>
+                    <th>Supervisor Comments</th>
                 </tr>
             </thead>
             <tbody>
@@ -178,14 +180,16 @@
                 <tr>
                     <td>{{ status.day }}</td>
                     <td>{{ status.date }}</td>
-                    <td>{{ status.time }}</td>
-                    <td>{{ status.supervisor_name }}</td>
+                    <td>{{ status.start_time }}</td>
+                    <td>{{ status.end_time }}</td>
                     <td>{{ status.comments }}</td>
+                    <!-- <td>{{ status.supervisor_name }}</td> -->
                     <td>{{ status.supervisor_approval }}</td>
+                    <td>{{ status.supervisor_comment }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3">No work status entries found.</td>
+                    <td colspan="8">No work status entries found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

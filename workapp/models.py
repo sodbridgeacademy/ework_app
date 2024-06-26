@@ -115,16 +115,20 @@ class WorkStatus(models.Model):
     application = models.ForeignKey(StudentApplication, on_delete=models.CASCADE, related_name='work_statuses', null=True)
     date = models.DateField()
     day = models.CharField(max_length=20, null=True)
-    time = models.CharField(max_length=20, null=True)
+    start_time = models.CharField(max_length=20, null=True)
+    end_time = models.CharField(max_length=20, null=True)
     supervisor_name = models.CharField(max_length=50, null=True)
     student_checked = models.BooleanField(default=False)
     #student_checked_date = models.DateTimeField(null=True)
     supervisor_approval = models.BooleanField(default=False)
-    comments = models.TextField(null=True)
+    comments = models.TextField(null=True, blank=True)
+    supervisor_comment = models.TextField(null=True)
 
     def __str__(self):
         return f"{self.day}: {self.application.student.username},{self.student_checked}, {self.comments} =>  {self.supervisor_approval} "
 
+    class Meta:
+        ordering = ['date']
 
 class BankDetails(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
