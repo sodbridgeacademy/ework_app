@@ -400,11 +400,12 @@ def approve_work_status(request, student_id, day):
         messages.error(request, 'No approved application found for this student at your posting place.')
         return redirect('dashboard')
     
-    work_status, created = WorkStatus.objects.get_or_create(application=application, day=day)
+    work_statuses = WorkStatus.objects.filter(application=application, day=day)
     
     if request.method == 'POST':
-        work_status.supervisor_approval = True
-        work_status.save()
+        for work_status in work_statuses:
+            work_status.supervisor_approval = True
+            work_status.save()
         
         # Check if all weeks are approved by both student and supervisor
         all_weeks_checked = WorkStatus.objects.filter(application=application, student_checked=True, supervisor_approval=True).count()
