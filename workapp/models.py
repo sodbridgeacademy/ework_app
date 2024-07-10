@@ -44,6 +44,9 @@ class User(AbstractUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+    class Meta:
+        ordering = ['-registration_date']
+
 
 class PostingPlace(models.Model):
     name = models.CharField(max_length=100)
@@ -83,7 +86,9 @@ class StudentApplication(models.Model):
         ('rejected', 'Rejected'),
     ]
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    supervisor_status = models.CharField(max_length=10, null=True, choices=STATUS_CHOICES, default='pending')
     director_approval = models.BooleanField(default=False)
+    supervisor_approval = models.BooleanField(default=False, null=True)
     work_completed = models.BooleanField(default=False, null=True, blank=True)
     payment_status = models.BooleanField(default=False, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)

@@ -13,6 +13,7 @@
 
     <!-- List of Posting Places -->
     <h5 style="color:red">Posting Places</h5>
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
@@ -39,6 +40,7 @@
         {% endfor %}
         </tbody>
     </table>
+    </div>
     <br><br>
 
     
@@ -52,13 +54,15 @@
     
     <!-- List of Student Applications -->
     <h5 style="color:red">Student Applications</h5> <hr>
+    <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Matric No</th>
                 <th>Posting Place</th>
-                <th>Status</th>
+                <th>Supervisor Approval</th>
+                <th>Director Approval</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -68,6 +72,7 @@
                 <td>{{ application.student.first_name }}, {{ application.student.last_name }}</td>
                 <td>{{ application.student.matric_number }}</td>
                 <td>{{ application.posting_place.name }}</td>
+                <td>{{ application.supervisor_approval }}</td>
                 <td>{{ application.get_status_display }}</td>
                 <td>
                     <a href="{% url 'update_application_status' application.id %}" class="btn btn-info">Update Status</a>
@@ -80,9 +85,11 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     <br><br>
     
     <h5 style="color:red">All Users</h5><hr>
+    <small><b>NB: Click a student user to see weekly reports and make payment.</b></small><hr>
     <div class="row">
         <div class="col-6">
             <!-- List of Supervisors -->

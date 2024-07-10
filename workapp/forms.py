@@ -106,20 +106,6 @@ class CustomAuthenticationForm(AuthenticationForm):
 
 
 
-class StudentApplicationForm2(forms.ModelForm):
-    class Meta:
-        model = StudentApplication
-        #fields = ['posting_place']
-        fields = ['status', 'signature', 'date_signed']
-        widgets = {
-            'status': forms.Select(choices=StudentApplication.STATUS_CHOICES),
-            'date_signed': forms.DateInput(attrs={
-                'placeholder': 'YYYY-MM-DD',
-                'class': 'form-control'
-            }),
-        }
-
-
 class StudentApplicationForm(forms.ModelForm):
     class Meta:
         model = StudentApplication
@@ -138,6 +124,28 @@ class StudentApplicationForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
             'date_signed': forms.DateInput(attrs={'type': 'date'}),
         }
+
+
+class StudentApplicationForm2(forms.ModelForm):
+    class Meta:
+        model = StudentApplication
+        #fields = ['posting_place']
+        fields = ['status', 'signature', 'date_signed']
+        widgets = {
+            'status': forms.Select(choices=StudentApplication.STATUS_CHOICES),
+            'date_signed': forms.DateInput(attrs={
+                'placeholder': 'YYYY-MM-DD',
+                'class': 'form-control'
+            }),
+        }
+
+
+
+class StudentApplicationForm3(forms.ModelForm):
+    class Meta:
+        model = StudentApplication
+        fields = ['supervisor_approval']
+
 
 
 class PostingPlaceForm(forms.ModelForm):
@@ -168,6 +176,20 @@ class UpdatePostingPlaceForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filter the supervisor choices to only include users with the 'supervisor' role
         self.fields['supervisor'].queryset = User.objects.filter(role='supervisor')
+
+
+
+
+class StudentCommentUpdate(forms.ModelForm):
+    class Meta:
+        model = WorkStatus
+        fields = ['comments']
+
+
+class SupervisorCommentUpdate(forms.ModelForm):
+    class Meta:
+        model = WorkStatus
+        fields = ['supervisor_comment']
 
 
 

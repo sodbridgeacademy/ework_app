@@ -15,7 +15,8 @@ urlpatterns = [
 
 	path('dashboard/', views.dashboard, name='dashboard'),
     path('submit-report/', views.submit_work_status, name='submit_work_status'),
-    path('update_application_status/<int:application_id>/', views.update_application_status, name='update_application_status'),
+    path('director_approval/<int:application_id>/', views.update_application_status, name='update_application_status'),
+    path('supervisor_approval/<int:application_id>/', views.update_application_status_by_supervisor, name='supervisor_approval'),
     path('supervisor/<int:pk>/', views.supervisor_detail, name='supervisor_detail'),
     path('student/<int:pk>/', views.student_detail, name='student_detail'),
     path('make_payment/<int:student_id>/', views.make_payment, name='make_payment'),

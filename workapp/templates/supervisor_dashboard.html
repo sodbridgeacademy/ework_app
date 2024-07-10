@@ -35,7 +35,9 @@
                         <th>Student Name</th>
                         <th>Matric Number</th>
                         <th>Department</th>
-                        <th>Application Status</th>
+                        <th>Supervisor Approval</th>
+                        <th>Director Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,16 +46,16 @@
                         <td>{{ student.student.first_name }} {{ student.student.last_name }}</td>
                         <td>{{ student.student.matric_number }}</td>
                         <td>{{ student.student.department }}</td>
+                        <td>{{ student.supervisor_approval}}</td>
                         <td>{{ student.status }}</td>
-
-                        
+                        <td><a href="{% url 'supervisor_approval' student.id %}" class="btn btn-info">Approve application</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     {% else %}
-        <p style="color:red">No students have been posted to your work place!</p>
+        <p style="color:red">No student have been posted to your work place!</p>
     {% endif %} <br><br>
 
 
@@ -124,6 +126,6 @@
             </table>
         </div>
     {% else %}
-        <p style="color:red">No weekly report!</p>
+        <p style="color:red">Weekly report not found!</p>
     {% endif %}
 {% endblock %}

@@ -12,11 +12,21 @@
     <p><strong>Application Post:</strong> {{ application.posting_place }}</p>
     <p><strong>Supervisor:</strong> {{ supervisor_name }}</p>
 
-    {% if application.status == 'rejected' %}
-        <p><strong>Status:</strong> 
-            <span style="color:red;">{{ application.status }}</span> | <a class="btn btn-info" href="mailto:{{director.email}}">Contact director</a>
+    {% if application.supervisor_approval == 'False' %}
+        <p><strong>Supervisor Status:</strong> 
+            <span style="color:red;">{{ application.status }}</span> | <a class="btn btn-info" href="mailto:{{director.email}}">Contact supervisor</a>
     {% else %}
-        <p><strong>Status:</strong> {{ application.status }}
+        <p><strong>Supervisor Status:</strong> <span style="color:green;"> {{ application.supervisor_approval }}</span>
+    </p>
+    {% endif %}
+
+    {% if application.status == 'rejected' %}
+        <p><strong>Director Status:</strong> 
+            <span style="color:red;">{{ application.status }}</span> | <a class="btn btn-info" href="mailto:{{director.email}}">Contact director</a>
+    {% elif application.status == 'pending' %}
+        <p><strong>Director Status:</strong> <span style="color:gray;"> {{ application.status }}</span>
+    {% else %}
+        <p><strong>Director Status:</strong><span style="color:green;"> {{ application.status }}</span>
 
         <p><strong>HOD Recommendation Letter:</strong> 
         {% if application.hod_recommendation_letter %}

@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
 	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
-	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm
+	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm, StudentApplicationForm3, \
+    SupervisorCommentUpdate, StudentCommentUpdate
 from django.contrib.auth.decorators import login_required
 from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
 from datetime import date
@@ -314,6 +315,20 @@ def update_application_status(request, application_id):
     else:
         form = StudentApplicationForm2(instance=application)
     return render(request, 'update_application_status.html', {'form': form, 'application': application})
+
+
+@login_required
+def update_application_status_by_supervisor(request, application_id):
+    application = get_object_or_404(StudentApplication, id=application_id)
+    if request.method == 'POST':
+        form = StudentApplicationForm3(request.POST, instance=application)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    else:
+        form = StudentApplicationForm3(instance=application)
+    return render(request, 'update_application_status_by_supervisor.html', {'form': form, 'application': application})
+
     
 
 
@@ -347,7 +362,7 @@ def student_detail(request, pk):
     applications = StudentApplication.objects.filter(student=student)
     bank_details = BankDetails.objects.filter(user=student).first()
     work_statuses = WorkStatus.objects.filter(application__student=student)
-    all_work_status_approved = all(ws.supervisor_checked for ws in work_statuses)
+    all_work_status_approved = all(ws.supervisor_approval for ws in work_statuses)
     # get latest student application
     latest_application = applications.latest('id') if applications.exists() else None
 
