@@ -78,10 +78,11 @@
     <!-- Payment Section -->
     <h5 style="color:green">Payment</h5> <hr>
     {% if latest_application.work_completed and not latest_application.payment_status %}
-        <form method="post" action="{% url 'make_payment' student.id %}">
+<!--         <form method="post" action="{% url 'make_payment' student.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-success">Make Payment</button>
-        </form>
+        </form> -->
+        <a class="btn btn-success" href="{% url 'make_payment' student.id %}">Make payment</a>
     {% elif latest_application.payment_status %}
         <p style="color:blue;">Student payment successfully made!<br> Thank you.</p>
     {% else %}

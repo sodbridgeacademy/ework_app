@@ -26,5 +26,6 @@ urlpatterns = [
     path('update_posting_place/<int:posting_place_id>/', views.update_posting_place, name='update_posting_place'),
     path('add_bank_details/', views.add_bank_details, name='add_bank_details'),
     path('application/<int:application_id>/', views.application_detail, name='application_detail'),
+    #path('make_payment/<int:application_id>/', views.make_payment, name='make_payment'),
    
 ]

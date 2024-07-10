@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
 	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
 	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm, StudentApplicationForm3, \
-    SupervisorCommentUpdate, StudentCommentUpdate
+    SupervisorCommentUpdate, StudentCommentUpdate, PaymentReceiptUploadForm
 from django.contrib.auth.decorators import login_required
 from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
 from datetime import date
@@ -234,7 +234,6 @@ def dashboard(request):
                 'application_form': application_form, 'posting_place_form':posting_place_form, 'app_count':app_count,
                  'work_statuses': work_statuses, 'user': user, 'work_statuses_count':work_statuses_count, 'latest_application': latest_application,\
                     'max_submissions':max_submissions, 'bank_detail':bank_detail, 'user':user, 'user_age':user_age}
-
         return render(request, 'student_dashboard.html', ctx)
     elif user.role == 'director':
         applications = StudentApplication.objects.all()
@@ -385,7 +384,7 @@ def student_detail(request, pk):
 
 
 @login_required
-def make_payment(request, student_id):
+def make_payment1(request, student_id):
     student = get_object_or_404(User, pk=student_id, role='student')
     # Logic for making the payment (this can be a simple confirmation for now)
     # For example, setting a "paid" status on the student's applications or work statuses
@@ -393,6 +392,28 @@ def make_payment(request, student_id):
     applications.update(payment_status=True)
     # Redirect back to the student detail page
     return redirect('student_detail', pk=student.id)
+
+
+@login_required
+def make_payment(request, student_id):
+    student = get_object_or_404(User, pk=student_id, role='student')
+    applications = StudentApplication.objects.filter(student=student, status='approved')
+
+    if request.method == 'POST':
+        payment_form = PaymentReceiptUploadForm(request.POST, request.FILES, instance=applications.first())
+        if payment_form.is_valid():
+            # Update all applications with the uploaded receipt and mark payment as true
+            for application in applications:
+                application.payment_receipt = payment_form.cleaned_data['payment_receipt']
+                application.payment_status = True
+                application.save()
+            messages.success(request, 'Payment receipt uploaded successfully.')
+            return redirect('student_detail', pk=student.id)
+    else:
+        payment_form = PaymentReceiptUploadForm(instance=applications.first())
+
+    return render(request, 'make_payment.html', {'payment_form': payment_form, 'student': student})
+
 
 
 @login_required

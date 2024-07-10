@@ -192,6 +192,12 @@ class SupervisorCommentUpdate(forms.ModelForm):
         fields = ['supervisor_comment']
 
 
+class PaymentReceiptUploadForm(forms.ModelForm):
+    class Meta:
+        model = StudentApplication
+        fields = ['payment_receipt']
+
+
 
 class BankDetailsForm(forms.ModelForm):
     class Meta:

@@ -69,6 +69,10 @@ def default_student_photo():
     return 'student_photos/default.jpeg'
 
 
+def default_receipt():
+    return 'receipts/default_payment_transfer.jpeg'
+
+
 def default_signature():
     return 'signatures/default_signature.jpeg'
 
@@ -91,6 +95,7 @@ class StudentApplication(models.Model):
     supervisor_approval = models.BooleanField(default=False, null=True)
     work_completed = models.BooleanField(default=False, null=True, blank=True)
     payment_status = models.BooleanField(default=False, null=True, blank=True)
+    payment_receipt = models.ImageField(upload_to='receipts/', default=default_receipt, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     student_photo = models.ImageField(upload_to='student_photos/', default=default_student_photo, null=True, blank=True)

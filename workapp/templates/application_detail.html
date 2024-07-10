@@ -36,6 +36,19 @@
             <p>No HOD recommendation letter uploaded.</p>
         {% endif %}
     </p>
+    <p><strong>Payment Status:</strong> 
+        {% if application.payment_status %} <span style="color:green;">{{ application.payment_status }}</span>{% else %}
+         <span style="color:red;">False</span>{% endif %}
+    </p>
+    <div>
+
+        {% if application.payment_status %}
+            <p><strong>Payment Receipt:</strong><a class="btn btn-info" href="{{ application.payment_receipt.url }}" target="_blank">View Receipt</a></p>
+        {% else %}
+            <p> <strong>Payment Receipt:</strong><span style="color:red;"> No receipt found!</span></p>
+        {% endif %}
+    </div>
+
 
     {% endif %}
 
