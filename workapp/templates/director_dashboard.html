@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ user.username }}'s Dashboard{% endblock %}
+{% block title %}Director {{ user.first_name }}'s Dashboard{% endblock %}
 
 {% load crispy_forms_tags %}
 
@@ -63,7 +63,8 @@
                 <th>Posting Place</th>
                 <th>Supervisor Approval</th>
                 <th>Director Approval</th>
-                <th>Action</th>
+                <th>Action 1</th>
+                <th>Action 2</th>
             </tr>
         </thead>
         <tbody>
@@ -77,6 +78,7 @@
                 <td>
                     <a href="{% url 'update_application_status' application.id %}" class="btn btn-info">Update Status</a>
                 </td>
+                <td><a href="{% url 'edit_posting_place' application.id %}" class="btn btn-info">Change Posting Place</a></td>
             </tr>
             {% empty %}
             <tr>

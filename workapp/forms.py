@@ -167,6 +167,16 @@ class PostingPlaceForm2(forms.ModelForm):
 
 
 
+class PostingPlaceEditForm(forms.ModelForm):
+    class Meta:
+        model = StudentApplication
+        fields = ['posting_place']
+        widgets = {
+            'posting_place': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+
+
 class UpdatePostingPlaceForm(forms.ModelForm):
     class Meta:
         model = PostingPlace

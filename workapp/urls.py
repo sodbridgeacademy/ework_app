@@ -14,6 +14,7 @@ urlpatterns = [
     path('reset_password/<str:token>/', views.reset_password, name='reset_password'),
 
 	path('dashboard/', views.dashboard, name='dashboard'),
+    path('application/<int:application_id>/edit_posting_place/', views.edit_posting_place, name='edit_posting_place'),
     path('submit-report/', views.submit_work_status, name='submit_work_status'),
     path('director_approval/<int:application_id>/', views.update_application_status, name='update_application_status'),
     path('supervisor_approval/<int:application_id>/', views.update_application_status_by_supervisor, name='supervisor_approval'),

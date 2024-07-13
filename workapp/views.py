@@ -3,7 +3,7 @@ from django.contrib.auth import login, authenticate
 from .forms import StudentRegistrationForm, DirectorRegistrationForm, SupervisorRegistrationForm, \
 	StudentApplicationForm, PostingPlaceForm, WorkStatusForm, StudentApplicationForm2, UpdatePostingPlaceForm, \
 	PostingPlaceForm2, SupervisorWorkStatusForm, BankDetailsForm, CustomAuthenticationForm, StudentApplicationForm3, \
-    SupervisorCommentUpdate, StudentCommentUpdate, PaymentReceiptUploadForm
+    SupervisorCommentUpdate, StudentCommentUpdate, PaymentReceiptUploadForm, PostingPlaceEditForm
 from django.contrib.auth.decorators import login_required
 from .models import User, PostingPlace, StudentApplication, BankDetails, WorkStatus
 from datetime import date
@@ -290,6 +290,28 @@ def dashboard(request):
     else:
         # Handle other cases (optional)
         return render(request, 'other_dashboard.html')
+
+
+
+@login_required
+def edit_posting_place(request, application_id):
+    application = get_object_or_404(StudentApplication, id=application_id)
+
+    if request.user.role != 'director':
+        messages.error(request, 'You do not have permission to edit this posting place.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        form = PostingPlaceEditForm(request.POST, instance=application)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Posting place updated successfully.')
+            return redirect('dashboard')
+            #return redirect('application_detail', application_id=application.id)
+    else:
+        form = PostingPlaceEditForm(instance=application)
+
+    return render(request, 'edit_posting_place.html', {'form': form, 'application': application})
 
 
 
